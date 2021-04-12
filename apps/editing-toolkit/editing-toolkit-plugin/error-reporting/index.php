@@ -91,7 +91,7 @@ function activate_error_reporting() {
  * increase the segment until we reach 100 and eventually just remove this logic.
  */
 function rollout_gradually() {
-	$current_segment = 10; // segment of existing users that will get this feature.
+	$current_segment = 100; // segment of existing users that will get this feature. Set to 100% here for testing purposes (activate for all, always activate).
 	$user_id         = get_current_user_id();
 	$user_segment    = $user_id % 100;
 
