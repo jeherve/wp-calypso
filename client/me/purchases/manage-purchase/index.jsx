@@ -14,7 +14,11 @@ import React, { Component, Fragment } from 'react';
 import AsyncLoad from 'calypso/components/async-load';
 import { abtest } from 'calypso/lib/abtest';
 import { recordTracksEvent } from 'calypso/lib/analytics/tracks';
-import { applyTestFiltersToPlansList, isWpComMonthlyPlan } from 'calypso/lib/plans';
+import {
+	applyTestFiltersToPlansList,
+	isWpComMonthlyPlan,
+	getMonthlyPlanByYearly,
+} from 'calypso/lib/plans';
 import { Button, Card, CompactCard, ProductIcon } from '@automattic/components';
 import config from '@automattic/calypso-config';
 import {
@@ -25,6 +29,7 @@ import {
 	getRenewalPrice,
 	handleRenewMultiplePurchasesClick,
 	handleRenewNowClick,
+	handleRenewMonthlyClick,
 	hasAmountAvailableToRefund,
 	hasPaymentMethod,
 	isPaidWithCredits,
@@ -39,6 +44,7 @@ import {
 	isCloseToExpiration,
 	purchaseType,
 	getName,
+	shouldRenderMonthlyRenewalOption,
 } from 'calypso/lib/purchases';
 import {
 	canEditPaymentDetails,
@@ -107,6 +113,8 @@ import { NON_PRIMARY_DOMAINS_TO_FREE_USERS } from 'calypso/state/current-user/co
 import { hasCustomDomain } from 'calypso/lib/site/utils';
 import { hasLoadedSiteDomains } from 'calypso/state/sites/domains/selectors';
 import NonPrimaryDomainDialog from 'calypso/me/purchases/non-primary-domain-dialog';
+import Badge from 'calypso/components/badge';
+import { getSitePlanRawPrice } from 'calypso/state/sites/plans/selectors';
 
 /**
  * Style dependencies
@@ -184,6 +192,12 @@ class ManagePurchase extends Component {
 		handleRenewNowClick( purchase, siteSlug, options );
 	};
 
+	handleRenewMonthly = () => {
+		const { purchase, siteSlug, redirectTo } = this.props;
+		const options = redirectTo ? { redirectTo } : undefined;
+		handleRenewMonthlyClick( purchase, siteSlug, options );
+	};
+
 	handleRenewMultiplePurchases = ( purchases ) => {
 		const { siteSlug, redirectTo } = this.props;
 		const options = redirectTo ? { redirectTo } : undefined;
@@ -223,8 +237,8 @@ class ManagePurchase extends Component {
 		);
 	}
 
-	renderRenewNowNavItem() {
-		const { purchase, translate } = this.props;
+	renderRenewalNavItem( content, onClick ) {
+		const { purchase } = this.props;
 
 		if ( ! config.isEnabled( 'upgrades/checkout' ) ) {
 			return null;
@@ -239,10 +253,41 @@ class ManagePurchase extends Component {
 		}
 
 		return (
-			<CompactCard tagName="button" displayAsLink onClick={ this.handleRenew }>
-				{ translate( 'Renew Now' ) }
+			<CompactCard tagName="button" displayAsLink onClick={ onClick }>
+				{ content }
 			</CompactCard>
 		);
+	}
+
+	renderRenewNowNavItem() {
+		const { translate } = this.props;
+		return this.renderRenewalNavItem( translate( 'Renew Now' ), this.handleRenew );
+	}
+
+	renderRenewAnnuallyNavItem() {
+		const { translate, purchase, relatedMonthlyPlanPrice } = this.props;
+		const annualPrice = getRenewalPrice( purchase ) / 12;
+		const savings = Math.round(
+			( 100 * ( relatedMonthlyPlanPrice - annualPrice ) ) / relatedMonthlyPlanPrice
+		);
+		return this.renderRenewalNavItem(
+			<div>
+				{ translate( 'Renew Annually' ) }
+				<Badge className="manage-purchase__savings-badge" type="success">
+					{ translate( '%(savings)d%% cheaper than monthly', {
+						args: {
+							savings,
+						},
+					} ) }
+				</Badge>
+			</div>,
+			this.handleRenew
+		);
+	}
+
+	renderRenewMonthlyNavItem() {
+		const { translate } = this.props;
+		return this.renderRenewalNavItem( translate( 'Renew Monthly' ), this.handleRenewMonthly );
 	}
 
 	handleUpgradeClick = () => {
@@ -675,6 +720,8 @@ class ManagePurchase extends Component {
 		const siteDomain = purchase.domain;
 		const siteId = purchase.siteId;
 
+		const renderMonthlyRenewalOption = shouldRenderMonthlyRenewalOption( purchase );
+
 		return (
 			<Fragment>
 				{ this.props.showHeader && (
@@ -723,7 +770,18 @@ class ManagePurchase extends Component {
 				/>
 
 				{ isProductOwner && preventRenewal && this.renderSelectNewNavItem() }
-				{ isProductOwner && ! preventRenewal && this.renderRenewNowNavItem() }
+				{ isProductOwner &&
+					! preventRenewal &&
+					! renderMonthlyRenewalOption &&
+					this.renderRenewNowNavItem() }
+				{ isProductOwner &&
+					! preventRenewal &&
+					renderMonthlyRenewalOption &&
+					this.renderRenewAnnuallyNavItem() }
+				{ isProductOwner &&
+					! preventRenewal &&
+					renderMonthlyRenewalOption &&
+					this.renderRenewMonthlyNavItem() }
 				{ isProductOwner && ! preventRenewal && this.renderUpgradeNavItem() }
 				{ isProductOwner && this.renderEditPaymentMethodNavItem() }
 				{ isProductOwner && this.renderCancelPurchaseNavItem() }
@@ -846,6 +904,8 @@ export default connect( ( state, props ) => {
 	const site = getSite( state, siteId );
 	const hasLoadedSites = ! isRequestingSites( state );
 	const hasLoadedDomains = hasLoadedSiteDomains( state, siteId );
+	const relatedMonthlyPlanSlug = getMonthlyPlanByYearly( purchase?.productSlug );
+	const relatedMonthlyPlanPrice = getSitePlanRawPrice( state, siteId, relatedMonthlyPlanSlug );
 	return {
 		hasLoadedDomains,
 		hasLoadedSites,
@@ -867,5 +927,7 @@ export default connect( ( state, props ) => {
 		theme: isPurchaseTheme && getCanonicalTheme( state, siteId, purchase.meta ),
 		isAtomicSite: isSiteAtomic( state, siteId ),
 		userId,
+		relatedMonthlyPlanSlug,
+		relatedMonthlyPlanPrice,
 	};
 } )( localize( ManagePurchase ) );
