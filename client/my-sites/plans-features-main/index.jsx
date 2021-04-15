@@ -80,6 +80,7 @@ import { isDiscountActive } from 'calypso/state/selectors/get-active-discount.js
 import { selectSiteId as selectHappychatSiteId } from 'calypso/state/help/actions';
 import { getABTestVariation } from 'calypso/lib/abtest';
 import PlanTypeSelector from './plan-type-selector';
+import { ProvideExperimentData } from 'calypso/lib/explat';
 
 /**
  * Style dependencies
@@ -132,7 +133,7 @@ export class PlansFeaturesMain extends Component {
 		}
 	}
 
-	showFeatureComparison() {
+	showFeatureComparison( experimentVariation = null ) {
 		const {
 			basePlansPath,
 			customerType,
@@ -191,12 +192,13 @@ export class PlansFeaturesMain extends Component {
 					} ) }
 					siteId={ siteId }
 					isReskinned={ isReskinned }
+					experimentVariation={ experimentVariation }
 				/>
 			</div>
 		);
 	}
 
-	getPlanFeatures() {
+	getPlanFeatures( experimentVariation = null ) {
 		const {
 			basePlansPath,
 			customerType,
@@ -264,6 +266,7 @@ export class PlansFeaturesMain extends Component {
 					isReskinned={ isReskinned }
 					isInVerticalScrollingPlansExperiment={ isInVerticalScrollingPlansExperiment }
 					kindOfPlanTypeSelector={ this.getKindOfPlanTypeSelector( this.props ) }
+					experimentVariation={ experimentVariation }
 				/>
 			</div>
 		);
@@ -515,12 +518,7 @@ export class PlansFeaturesMain extends Component {
 	}
 
 	render() {
-		const {
-			siteId,
-			customHeader,
-			redirectToAddDomainFlow,
-			shouldShowPlansFeatureComparison,
-		} = this.props;
+		const { siteId, customHeader, redirectToAddDomainFlow } = this.props;
 		const plans = this.getPlansForPlanFeatures();
 		const visiblePlans = this.getVisiblePlansForPlanFeatures( plans );
 		const kindOfPlanTypeSelector = this.getKindOfPlanTypeSelector( this.props );
@@ -551,10 +549,35 @@ export class PlansFeaturesMain extends Component {
 						plans={ visiblePlans }
 					/>
 				) }
-				{ shouldShowPlansFeatureComparison ? this.showFeatureComparison() : this.getPlanFeatures() }
+				{ this.hideEcommerceWrapper() }
 				{ this.renderProductsSelector() }
 				{ this.mayRenderFAQ() }
 			</div>
+		);
+	}
+
+	hideEcommerceWrapper() {
+		const { isLaunchPage, shouldShowPlansFeatureComparison } = this.props;
+		if ( ! isLaunchPage ) {
+			return shouldShowPlansFeatureComparison
+				? this.showFeatureComparison()
+				: this.getPlanFeatures();
+		}
+
+		return (
+			<ProvideExperimentData name="hide_ecommerce_launch_site">
+				{ ( isLoading, experimentAssignment ) => {
+					if ( isLoading ) {
+						return null;
+					}
+
+					const experimentVariation = experimentAssignment?.variationName;
+
+					return shouldShowPlansFeatureComparison
+						? this.showFeatureComparison( experimentVariation )
+						: this.getPlanFeatures( experimentVariation );
+				} }
+			</ProvideExperimentData>
 		);
 	}
 

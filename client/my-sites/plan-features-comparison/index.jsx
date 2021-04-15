@@ -340,15 +340,24 @@ export default connect(
 			placeholder,
 			plans,
 			isLandingPage,
+			isLaunchPage,
 			siteId,
 			visiblePlans,
 			popularPlanSpec,
+			experimentVariation,
 		} = ownProps;
 		const signupDependencies = getSignupDependencyStore( state );
 		const siteType = signupDependencies.designType;
+		const isInHideECommerceExperiment =
+			isInSignup && isLaunchPage && 'treatment' === experimentVariation;
+		const filteredPlans = isInHideECommerceExperiment
+			? plans.filter(
+					( plan ) => ! [ 'ecommerce-bundle', 'ecommerce-bundle-monthly' ].includes( plan )
+			  )
+			: plans;
 
 		let planProperties = compact(
-			map( plans, ( plan ) => {
+			map( filteredPlans, ( plan ) => {
 				let isPlaceholder = false;
 				const planConstantObj = applyTestFiltersToPlansList( plan, abtest );
 				const planProductId = planConstantObj.getProductId();

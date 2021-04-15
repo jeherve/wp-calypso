@@ -937,6 +937,8 @@ const ConnectedPlanFeatures = connect(
 			visiblePlans,
 			popularPlanSpec,
 			kindOfPlanTypeSelector,
+			isLaunchPage,
+			experimentVariation,
 		} = ownProps;
 		const selectedSiteId = siteId;
 		const selectedSiteSlug = getSiteSlug( state, selectedSiteId );
@@ -952,9 +954,16 @@ const ConnectedPlanFeatures = connect(
 		const canPurchase = ! isPaid || isCurrentUserCurrentPlanOwner( state, selectedSiteId );
 		const isLoggedInMonthlyPricing =
 			! isInSignup && ! isJetpack && kindOfPlanTypeSelector === 'interval';
+		const isInHideECommerceExperiment =
+			isInSignup && isLaunchPage && 'treatment' === experimentVariation;
+		const filteredPlans = isInHideECommerceExperiment
+			? plans.filter(
+					( plan ) => ! [ 'ecommerce-bundle', 'ecommerce-bundle-monthly' ].includes( plan )
+			  )
+			: plans;
 
 		let planProperties = compact(
-			map( plans, ( plan ) => {
+			map( filteredPlans, ( plan ) => {
 				let isPlaceholder = false;
 				const planConstantObj = applyTestFiltersToPlansList( plan, abtest, {
 					isLoggedInMonthlyPricing,
