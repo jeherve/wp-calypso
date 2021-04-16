@@ -15,7 +15,7 @@ import { styled } from '@automattic/wpcom-checkout';
 import joinClasses from './join-classes';
 import Coupon from './coupon';
 import { WPOrderReviewLineItems, WPOrderReviewSection } from './wp-order-review-line-items';
-import { isDomainRegistration, isDomainTransfer } from 'calypso/lib/products-values';
+import { isDomainRegistration, isDomainTransfer } from '@automattic/calypso-products';
 import type { CouponFieldStateProps } from '../hooks/use-coupon-field-state';
 import type { GetProductVariants } from '../hooks/product-variants';
 import type { OnChangeItemVariant } from './item-variation-picker';
