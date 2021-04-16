@@ -71,7 +71,11 @@ export function getProxyType() {
 	}
 }
 
-export async function startBrowser( { useCustomUA = true, resizeBrowserWindow = true } = {} ) {
+export async function startBrowser( {
+	useCustomUA = true,
+	resizeBrowserWindow = true,
+	disableThirdPartyCookies = false,
+} = {} ) {
 	if ( global.__BROWSER__ ) {
 		return global.__BROWSER__;
 	}
@@ -115,6 +119,17 @@ export async function startBrowser( { useCustomUA = true, resizeBrowserWindow = 
 			options = new chrome.Options();
 			options.addArguments( '--app=https://www.wordpress.com' );
 			options.addArguments( userAgent );
+			// eslint-disable-next-line no-case-declarations
+			const prefs = {
+				enable_do_not_track: true,
+				credentials_enable_service: false,
+				intl: { accept_languages: locale },
+			};
+
+			if ( disableThirdPartyCookies ) {
+				prefs.default_content_settings = { cookies: 2 };
+			}
+			options.setUserPreferences( prefs );
 			builder.setChromeOptions( options );
 		}
 
@@ -136,11 +151,17 @@ export async function startBrowser( { useCustomUA = true, resizeBrowserWindow = 
 		switch ( browser.toLowerCase() ) {
 			case 'chrome':
 				options = new chrome.Options();
-				options.setUserPreferences( {
+				// eslint-disable-next-line no-case-declarations
+				const prefs = {
 					enable_do_not_track: true,
 					credentials_enable_service: false,
 					intl: { accept_languages: locale },
-				} );
+				};
+
+				if ( disableThirdPartyCookies ) {
+					prefs.default_content_settings = { cookies: 2 };
+				}
+				options.setUserPreferences( prefs );
 				options.setProxy( getProxyType() );
 				options.addArguments( '--no-first-run' );
 				options.addArguments( '--no-sandbox' );
@@ -187,12 +208,16 @@ export async function startBrowser( { useCustomUA = true, resizeBrowserWindow = 
 				profile.setPreference( 'browser.startup.homepage', 'about:blank' );
 				profile.setPreference( 'startup.homepage_welcome_url.additional', 'about:blank' );
 				profile.setPreference( 'intl.accept_languages', locale );
+				if ( disableThirdPartyCookies ) {
+					profile.setPreference( 'network.cookie.cookieBehavior', 2 );
+				}
 				if ( useCustomUA ) {
 					profile.setPreference(
 						'general.useragent.override',
 						'Mozilla/5.0 (wp-e2e-tests) Gecko/20100101 Firefox/46.0'
 					);
 				}
+
 				options = new firefox.Options().setProfile( profile );
 				options.setProxy( getProxyType() );
 				builder = new webdriver.Builder();
