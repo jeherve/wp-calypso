@@ -7,6 +7,7 @@ import { FormStatus, useFormStatus } from '@automattic/composite-checkout';
 import { useTranslate } from 'i18n-calypso';
 import { useShoppingCart } from '@automattic/shopping-cart';
 import type { RemoveProductFromCart, CouponStatus } from '@automattic/shopping-cart';
+import { useSelector } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -19,8 +20,10 @@ import styled from '../lib/styled';
 import type { CouponFieldStateProps } from '../hooks/use-coupon-field-state';
 import type { GetProductVariants } from '../hooks/product-variants';
 import type { OnChangeItemVariant } from './item-variation-picker';
+import isSiteWPForTeams from 'calypso/state/selectors/is-site-wpforteams';
+import getSelectedSite from 'calypso/state/ui/selectors/get-selected-site';
 
-const DomainURL = styled.div`
+const SiteSummary = styled.div`
 	color: ${ ( props ) => props.theme.colors.textColorLight };
 	font-size: 14px;
 	margin-top: -10px;
@@ -97,12 +100,31 @@ export default function WPCheckoutOrderReview( {
 		return removeCoupon();
 	};
 
+	const selectedSiteData = useSelector( ( state ) => getSelectedSite( state ) );
+	const isWPForTeamsSite = useSelector( ( state ) => {
+		if ( ! selectedSiteData?.ID ) {
+			return false;
+		}
+
+		return isSiteWPForTeams( state, selectedSiteData.ID );
+	} );
+
 	return (
 		<div
 			className={ joinClasses( [ className, 'checkout-review-order', isSummary && 'is-summary' ] ) }
 		>
-			{ domainUrl && 'no-user' !== domainUrl && (
-				<DomainURL>{ translate( 'Site: %s', { args: domainUrl } ) }</DomainURL>
+			{ ! isWPForTeamsSite && domainUrl && 'no-user' !== domainUrl && (
+				<SiteSummary>{ translate( 'Site: %s', { args: domainUrl } ) }</SiteSummary>
+			) }
+			{ isWPForTeamsSite && selectedSiteData?.name && (
+				<SiteSummary>
+					{ translate( 'Upgrade: {{strong}}%s{{/strong}}', {
+						args: selectedSiteData.name,
+						components: {
+							strong: <strong />,
+						},
+					} ) }
+				</SiteSummary>
 			) }
 
 			<WPOrderReviewSection>
