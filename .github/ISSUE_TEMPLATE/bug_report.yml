@@ -1,119 +1,146 @@
-name: Bug Report
-description: Helps us improve our product!
-labels: ["Needs triage", "[Type] Bug"]
-type: 'Bug'
+name: IPSM Bug Report v2
+description: Help us improve our product!
+labels: "Needs triage"
 body:
   - type: markdown
     attributes:
       value: |
-        ### Thanks for contributing!
-
-        Please write a clear title, then fill in the fields below and submit.
-
-        Please **do not** link to image hosting services such as Cloudup, Droplr, Imgur, etc…
-        Instead, directly embed screenshot(s) or recording(s) in any of the text areas below: click, then drag and drop.
-
-        If you have any questions, please ask in: `#dotcom-triage-alerts`.
+        
+        > [!IMPORTANT]
+        > **Thanks for contributing!**
+        >
+        > Please write a clear title, then fill in the fields below and submit.
+        >
+        > **Do not** link to image hosting services such as Cloudup, Droplr, Imgur, etc…
+        > Instead, directly embed screenshot(s) or recording(s) in any of the text areas below: click, then drag and drop.
+        >
+        > Automattician? Ask any questions about this process in: `#dotcom-triage-alerts`.
+        >
+        
   - type: markdown
     attributes:
       value: |
-        ---
+        <br>        
+
         ## Core Information
+        
   - type: textarea
-    id: summary
+    id: context
     attributes:
-        label: Quick summary
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce
+      label: Context and steps to reproduce
       placeholder: |
+        E.g., What happened, and what did you expect to happen? Add images,
+        GIFs, and videos if you have them on hand.
+
         1. Start at `site-domain.com/blog`.
         2. Click on any blog post.
         3. Click on the 'Like' button.
-        4. ...
+
+        Add any information that may be relevant, such as:
+
+        - Theme
+        - Logs/Errors
     validations:
       required: true
-  - type: textarea
-    id: expected
+
+  - type: markdown
     attributes:
-      label: What you expected to happen
-      placeholder: |
-        e.g. The post should be liked.
-    validations:
-      required: true
-  - type: textarea
-    id: actual
-    attributes:
-      label: What actually happened
-      placeholder: |
-        e.g. Clicking the button does nothing visibly.
-    validations:
-      required: true
+      value: |
+        <br>   
+        
+        ## Impact
+        Please help us understand more about the impact of this issue to help determine next steps.
+        If you are unsure about anything, please use your judgment to make an educated guess.
+        <br>   
+
   - type: dropdown
-    id: users-affected
+    id: impact
     attributes:
-      label: Impact
-      description: Approximately how many users are impacted?
+      label: Site owner impact
+      description: Approximately what percentage of the total users of the platform are impacted? Unsure? Please provide your most educated guess! <br><br>
       options:
-        - One
-        - Some (< 50%)
-        - Most (> 50%)
-        - All
+        - Less than 20% of all
+        - Between 20% and 60% of all
+        - More than 60% of all
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        <br>   
+
   - type: dropdown
-    id: workarounds
+    id: severity
     attributes:
-      label: Available workarounds?
+      label: Severity
+      description: What is the severity of this issue? Please take a look at the descriptions below for further context.<br>
+        <br> - **Critical:** Prevents core functionality or has severe business impact.
+        <br> - **Major:** Significantly impairs important features or has notable business impact.
+        <br> - **Moderate:** Affects non-critical features or has limited business impact.
+        <br> - **Minor:** Causes inconvenience or has minimal impact on functionality. <br><br>
       options:
-        - No and the platform is unusable
-        - No but the platform is still usable
-        - Yes, difficult to implement
-        - Yes, easy to implement
-        - There is no user impact
+        - Critical
+        - Major
+        - Moderate
+        - Minor     
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        <br>   
+
+  - type: dropdown
+    id: additional-impact
+    attributes:
+      label: What other impact(s) does this issue have?
+      description: You may select more than one
+      options:
+        - Platform revenue
+        - Agency or developer revenue
+        - Individual site owner revenue
+        - No revenue impact
+      multiple: true
 
   - type: markdown
     attributes:
       value: |
         <br>
-
+        
+        ## Optional Information
+        
   - type: textarea
-    id: workaround-detail
+    id: workaround
     attributes:
-      label: If the above answer is "Yes...", outline the workaround.
+      label: If a workaround is available, please outline it here.
       placeholder: |
         Provide details of the specific steps to take that resolve the issue, e.g.:
           - Open "Setting X".
           - Toggle "Option Y".
           - Click "Button Z".
 
-  - type: markdown
-    attributes:
-      value: |
-        <br>
-
-        ## Optional Information
-
-        The following section is optional.
   - type: dropdown
     id: site-type
     attributes:
-      label: Platform (Simple and/or Atomic)
+      label: Platform
       description: (You may select more than one)
       options:
         - Simple
         - Atomic
         - Self-hosted
       multiple: true
-  - type: textarea
-    id: logs
+
+  - type: markdown
     attributes:
-      label: Logs or notes
-      placeholder: |
-        Add any information that may be relevant, such as:
-          - Browser/Platform
-          - Theme
-          - Logs/Errors
+      value: |
+        <br>
+        
+        ## Next steps
+
+        Feel free to add any `[Feature]` labels you feel fit. Once you submit this issue, we'll process it, add additional labels, set a priority, and add it to our new issue queue for triage.
+
+        You are welcome to click the `Subscribe` button you see in the right sidebar *after* the issue has been submitted!
+
+        <br>
