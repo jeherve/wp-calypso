@@ -20,6 +20,7 @@ body:
     attributes:
       value: |
         <br>
+
         ## Core Information
 
   - type: textarea
@@ -45,6 +46,7 @@ body:
     attributes:
       value: |
         <br>
+
         ## Impact
         Please help us understand more about the impact of this issue to help determine next steps.
         If you are unsure about anything, please use your judgment to make an educated guess.
@@ -91,6 +93,7 @@ body:
     attributes:
       value: |
         <br>
+
         ## Optional Information
 
   - type: textarea
@@ -118,6 +121,7 @@ body:
     attributes:
       value: |
         <br>
+
         ## Next steps
 
         Feel free to add any `[Feature]` labels you feel fit. Once you submit this issue, we'll process it, add additional labels, set a priority, and add it to our new issue queue for triage.
