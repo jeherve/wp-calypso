@@ -15,11 +15,11 @@ body:
         > Instead, directly embed screenshot(s) or recording(s) in any of the text areas below: click, then drag and drop.
         >
         > Automattician? Ask any questions about this process in: `#dotcom-triage-alerts`.
-        >
 
   - type: markdown
     attributes:
       value: |
+        <br>
         ## Core Information
 
   - type: textarea
@@ -44,6 +44,7 @@ body:
   - type: markdown
     attributes:
       value: |
+        <br>
         ## Impact
         Please help us understand more about the impact of this issue to help determine next steps.
         If you are unsure about anything, please use your judgment to make an educated guess.
@@ -51,7 +52,7 @@ body:
     id: impact
     attributes:
       label: Site owner impact
-      description: Approximately what percentage of the total users of the platform are impacted? Unsure? Please provide your most educated guess! <br><br>
+      description: Approximately what percentage of the total users of the platform are impacted? Unsure? Please provide your most educated guess!
       options:
         - Less than 20% of all
         - Between 20% and 60% of all
@@ -89,6 +90,7 @@ body:
   - type: markdown
     attributes:
       value: |
+        <br>
         ## Optional Information
 
   - type: textarea
@@ -115,6 +117,7 @@ body:
   - type: markdown
     attributes:
       value: |
+        <br>
         ## Next steps
 
         Feel free to add any `[Feature]` labels you feel fit. Once you submit this issue, we'll process it, add additional labels, set a priority, and add it to our new issue queue for triage.
